@@ -1,7 +1,8 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\strings"
   ],
-  "SelectedNode": "\\Hello.rb",
+  "SelectedNode": "\\strings\\manipulation.rb",
   "PreviewInSolutionExplorer": false
 }
