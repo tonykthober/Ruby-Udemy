@@ -1,0 +1,14 @@
+https://c9.io/
+
+https://www.virtualbox.org/wiki/Downloads
+
+https://drive.google.com/file/d/0B0z-XC2F2egBSkQ2cFFuMk9ER1k/view?usp=sharing
+
+machine password = ruby
+
+rvm.io
+
+sudo apt install gdebi
+
+https://code.visualstudio.com
+
