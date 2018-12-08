@@ -12,14 +12,29 @@ class Ship
     @y = @galigoo_window.height / 2
     @x_offset = @image.width / 2
     @y_offset = @image.height / 2
+    @lasers = []
   end
 
   def draw
     @image.draw_rot(@x, @y, 0, 0)
+
+    # method 1
+    # @lasers.each { |laser| laser.draw}
+
+    # method 2
+    @lasers.each do |laser|
+      laser.draw
+    end
   end
 
   def update
     move
+    # method 1
+    # @lasers.each { |laser| laser.update}
+    # method 2
+    @lasers.each do |laser|
+      laser.update
+    end
   end
 
   def move
@@ -62,5 +77,17 @@ class Ship
     if @y < @galigoo_window.height - @y_offset
       @y = @y + @time
     end
+  end
+
+  def button_down(key_press)
+    case key_press
+    when Gosu::KbSpace
+      fire_laser(SingleLaser.new(@galigoo_window, self, @x, @y))
+    end
+  end
+
+  def fire_laser(laser)
+    @lasers << laser
+    laser.fire
   end
 end
