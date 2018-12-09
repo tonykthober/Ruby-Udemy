@@ -70,7 +70,7 @@ class Galigoo < Gosu::Window
   end
   
   def update
-    unless @pause || @game_over
+    unless @paused || @game_over
     @ship.update
     @asteroids.each do |asteroid|
       asteroid.update
@@ -130,15 +130,16 @@ class Galigoo < Gosu::Window
   end
 
   def draw_pause_screen
-    draw_text("Paused", 310, 240)
-    draw_text("Escape - Quit", 310, 280)
-    draw_text("Space - Fire Weapons", 310, 280)
-    draw_text("N - Nuke", 310, 340)
+    draw_text("Paused", 310, 230)
+    draw_text("Escape - Quit", 310, 270)
+    draw_text("Space/L_Alt - Fire Weapons", 310, 310)
+    draw_text("N - Nuke", 310, 350)
   end
 
   def draw_game_over_screen
     draw_text("Game Over!", 310, 240)
     draw_text("Press Enter to Play Again", 310, 280)
+    # draw_text("Escape - Quit", 310, 310)
   end
 
   def draw_life_counter
