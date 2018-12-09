@@ -1,33 +1,61 @@
 class Ship
 
+  attr_accessor :time, :x, :y
+
   def self.load_image_file(galigoo_window)
     @ship_image_file = Gosu::Image.new('media/x_wing.png')
+  end
+
+  def self.load_explosion_sound(galigoo_window)
+    @explosion_sound_file = Gosu::Sample.new('media/explosion.ogg')
   end
 
   def initialize(galigoo_window)
     @galigoo_window = galigoo_window
     @image = self.class.load_image_file(galigoo_window)
+    @explosion = self.class.load_explosion_sound(galigoo_window)
     @time = 15
     @x = @galigoo_window.width / 2
     @y = @galigoo_window.height / 2
     @x_offset = @image.width / 2
     @y_offset = @image.height / 2
     @lasers = []
+    reset
+  end
+
+  def reset
+    @exploding = false
+    @x = @galigoo_window.width / 2
+    @y = 400
   end
 
   def draw
-    @image.draw_rot(@x, @y, 0, 0)
+    if @exploding
+      c1 = Gosu::Color.new(0xff_ffffff)
+      c1.alpha = @exploding_counter
+      c1.green = (@exploding_counter / 2)
 
-    # method 1
-    # @lasers.each { |laser| laser.draw}
+      scale = 1.5 + (((200 - @exploding_counter) / 200.0) * 0.75)
+      @image.draw_rot(@x, @y, ZOrder::SHIP, 0, 0.5, 0.5, scale, scale, c1)
 
-    # method 2
-    @lasers.each do |laser|
-      laser.draw
+    elsif @spawning
+      c1 = Gosu::Color.new(0xff_ffffff)
+      @image.draw_rot(@x, @y, ZOrder::SHIP, 0, 0.5, 0.5, 1, 1, c1)
+    else
+      @image.draw_rot(@x, @y, ZOrder::SHIP, 0)
+      # method 1
+      # @lasers.each { |laser| laser.draw}
+
+      # method 2
+      @lasers.each do |laser|
+        laser.draw
+      end       
     end
   end
 
   def update
+    update_explosion
+    update_spawning
     move
     # method 1
     # @lasers.each { |laser| laser.update}
@@ -37,7 +65,35 @@ class Ship
     end
   end
 
+  def update_explosion
+    if @exploding then
+      @exploding_counter -= 1
+      if @exploding_counter <= 0 then
+        @exploding = false
+        @galigoo_window.new_player
+      end
+    end
+  end
+
+  def update_spawning
+    if @spawning then
+      @spawning_counter = 100
+      @spawning_counter -= 1
+      if @spawning_counter < 0 then
+        @spawning = false
+      end
+    end    
+  end
+
+  def spawn
+    if @spawning == true
+      @spawning_counter = nil
+      reset
+    end
+  end
+
   def move
+    return if @exploding
     if @galigoo_window.button_down? Gosu::KB_LEFT or @galigoo_window::button_down? Gosu::GP_LEFT
       move_left
     end
@@ -83,11 +139,39 @@ class Ship
     case key_press
     when Gosu::KbSpace
       fire_laser(SingleLaser.new(@galigoo_window, self, @x, @y))
+    when Gosu::KbLeftAlt
+      fire_laser(DoubleLaser.new(@galigoo_window, self, @x, @y))
     end
+  end
+
+  def radius
+    @radius = @image.width / 2
+  end
+
+  def destroy
+    @galigoo_window.play_sound(@explosion)
+    @exploding = true
+    @exploding_counter = 200
+  end
+
+  def can_collide?
+    !@spawning && !@exploding    
   end
 
   def fire_laser(laser)
     @lasers << laser
     laser.fire
+  end
+
+  def remove_laser(laser)
+    @lasers.delete(laser)
+  end
+
+  def collide?(thing)
+    if can_collide? && Utilities.collide?(self, thing)
+      self.destroy
+      return true
+    end
+    @lasers.any? { |laser| laser.collide?(thing) }
   end
 end

@@ -45,10 +45,18 @@ class BaseLaser
   end
 
   def fire
-    play_laser
+    play_sound
   end
 
-  def play_laser
+  def play_sound
     @galigoo_window.play_sound(@laser_sound, @laser_sound_frequency, @laser_volume)
+  end
+
+  def collide?(thing)
+    if (Gosu::distance(@x - @width, @y, thing.x, thing.y) < thing.radius) then
+      true
+    else
+      false
+    end
   end
 end
